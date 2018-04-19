@@ -1,0 +1,10 @@
+<launch>
+  <include file="$(find video_stream_opencv)/launch/camera.launch">
+    <arg name="set_camera_fps" value="1"/>
+  </include>
+  
+  <node name="object_detector" pkg="object_detector" type="detector.py">
+    <!-- <env name="PYTHONPATH" value="/home/sakurai/.pyenv/versions/anaconda2-5.1.0/lib/python2.7/site-packages:/usr/lib/python2.7/dist-packages:$PYTHONPATH" /> -->
+  </node>
+</launch>
+
