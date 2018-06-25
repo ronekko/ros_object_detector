@@ -6,6 +6,9 @@ Created on Tue Apr 17 21:40:56 2018
 @author: sakurai
 """
 
+import sys
+sys.path.append('/usr/lib/python2.7/dist-packages')
+
 import chainercv
 import cv2
 import matplotlib.pyplot as plt
