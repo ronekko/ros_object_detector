@@ -19,6 +19,7 @@ import message_filters
 import rospy
 from sensor_msgs.msg import Image, CameraInfo, CompressedImage
 from std_msgs.msg import String
+from object_detector.msg import BoundingBox, BoundingBoxes
 
 
 def callback_raw(image, camera_info, net, publisher):
@@ -34,10 +35,17 @@ def callback_raw(image, camera_info, net, publisher):
     classes = []
     for label in labels:
         classes.append(chainercv.datasets.voc_bbox_label_names[label])
-    result = ', '.join(classes)
 
-    print(result)
-    publisher.publish(result)
+    detection = BoundingBoxes()
+    for name, bbox, score in zip(classes, bboxes, scores):
+        y_min, x_min, y_max, x_max = bbox
+        bounding_box = BoundingBox(
+            class_name=name, score=score,
+            y_min=y_min, x_min=x_min, y_max=y_max, x_max=x_max)
+        detection.bounding_boxes.append(bounding_box)
+    detection.num_detection = len(detection.bounding_boxes)
+
+    publisher.publish(detection)
 
 
 if __name__ == '__main__':
@@ -48,7 +56,8 @@ if __name__ == '__main__':
     sub_image = message_filters.Subscriber('/camera/image_raw', Image)
     sub_info = message_filters.Subscriber('/camera/camera_info', CameraInfo)
 
-    pub_objects = rospy.Publisher('object_classes', String, queue_size=10)
+    pub_objects = rospy.Publisher(
+        'object_classes', BoundingBoxes, queue_size=10)
 
     ts = message_filters.TimeSynchronizer([sub_image, sub_info], 2)
     ts.registerCallback(callback_raw, net, pub_objects)
