@@ -37,10 +37,11 @@ def callback_raw(image, camera_info, net, publisher):
         classes.append(chainercv.datasets.voc_bbox_label_names[label])
 
     detection = BoundingBoxes()
-    for name, bbox, score in zip(classes, bboxes, scores):
+    for label, score, bbox in zip(labels, scores, bboxes):
+        class_name = chainercv.datasets.voc_bbox_label_names[label]
         y_min, x_min, y_max, x_max = bbox
         bounding_box = BoundingBox(
-            class_name=name, score=score,
+            class_id=label, class_name=class_name, score=score,
             y_min=y_min, x_min=x_min, y_max=y_max, x_max=x_max)
         detection.bounding_boxes.append(bounding_box)
     detection.num_detection = len(detection.bounding_boxes)
